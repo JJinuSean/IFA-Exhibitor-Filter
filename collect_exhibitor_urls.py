@@ -11,10 +11,10 @@ def collect_exhibitor_urls(
     searchgroup: Optional[str] = "00000001-exhibitors",
     start_page: Optional[int] = 1, 
     end_page: Optional[int] = 75
-) -> Tuple[list, list]:
+) -> Tuple[list[str], list[str]]:
     company_list = []
     ifa_companies_links = []
-    for i in tqdm(range(start_page, end_page + 1)):
+    for i in tqdm(range(start_page, end_page + 1), desc="Collecting Exhibitors"):
         url = f"{base_url}{path}?&page={i}&searchgroup={searchgroup}"
         response = requests.get(url)
         if response.status_code == 200:
@@ -32,4 +32,5 @@ def collect_exhibitor_urls(
     full_urls = [
         base_url + postfix for postfix in ifa_companies_links
     ]
+    
     return company_list, full_urls
