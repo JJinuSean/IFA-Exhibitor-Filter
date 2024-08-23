@@ -2,7 +2,7 @@ import argparse
 import pandas as pd
 
 from collect_exhibitor_urls import collect_exhibitor_urls
-from company_info_extractor_refactor import extract_info, get_top_k_similar_companies
+from extract_company_info import extract_info, get_top_k_similar_companies
 from utils import scores_to_csv, get_company_info
 
 
