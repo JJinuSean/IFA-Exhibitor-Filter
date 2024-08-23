@@ -22,6 +22,10 @@ def translate_text(
     You are a translator.
     Your task is to translate the given '# source text' into English.
 
+    # Instructions:
+    1. If the given text is already in English, output it as is.
+    2. If the text contains any <SEP-i> (where i is a number), treat it as a separator and ensure it remains unchanged in the output.
+
     # source text
     {text}
 
@@ -33,8 +37,8 @@ def translate_text(
     for i in tqdm(range(0, len(texts), batch_size), desc="Translating batches"):
         batch_texts = texts[i:i + batch_size]
         
-        jointed_texts = "\n\n".join([f"<SEP{i}> {text}" for i, text in enumerate(batch_texts)])
-        jointed_texts += f"<SEP{len(batch_texts)}>"
+        jointed_texts = "\n\n".join([f"<SEP-{i}> {text}" for i, text in enumerate(batch_texts)])
+        jointed_texts += f"<SEP-{len(batch_texts)}>"
 
         prompt = prompt_template.format(text=jointed_texts)
         messages = [
@@ -52,8 +56,8 @@ def translate_text(
         translated_batch = response.choices[0].message.content.strip()
 
         for j in range(len(batch_texts)):
-            start_tag = f"<SEP{j}>"
-            end_tag = f"<SEP{j+1}>" if j < len(batch_texts) else None
+            start_tag = f"<SEP-{j}>"
+            end_tag = f"<SEP-{j+1}>"
 
             start_idx = translated_batch.find(start_tag)
             end_idx = translated_batch.find(end_tag)
