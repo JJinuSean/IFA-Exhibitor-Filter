@@ -19,8 +19,7 @@ def translate_text(
         model = "azure/" + model
 
     prompt_template = """
-    You are a translator.
-    Your task is to translate the given '# source text' into English.
+    Translate the following '#source text' into English according to the instructions below:
 
     # Instructions:
     1. If the given text is already in English, output it as is.
@@ -29,7 +28,7 @@ def translate_text(
     # source text
     {text}
 
-    # translated result
+    # translated text
     """.lstrip()
 
     translated_texts = []
@@ -37,10 +36,11 @@ def translate_text(
     for i in tqdm(range(0, len(texts), batch_size), desc="Translating batches"):
         batch_texts = texts[i:i + batch_size]
         
-        jointed_texts = "\n\n".join([f"<SEP-{i}> {text}" for i, text in enumerate(batch_texts)])
-        jointed_texts += f"<SEP-{len(batch_texts)}>"
+        jointed_texts = "".join([f"<SEP-{i}>\n{text}\n" for i, text in enumerate(batch_texts)])
+        jointed_texts += f"<SEP-{len(batch_texts)}>\n"
 
         prompt = prompt_template.format(text=jointed_texts)
+
         messages = [
             {"role": "user", "content": prompt},
         ]
@@ -52,6 +52,7 @@ def translate_text(
             "api_version": api_version,
             "model": model,
         }
+        
         response = litellm.completion(**completion_kwargs)
         translated_batch = response.choices[0].message.content.strip()
 
